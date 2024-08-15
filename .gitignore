@@ -2,3 +2,4 @@ src/bin
 src/obj
 src/FanControl.LianLiPlugin.csproj.user
 src/.vs
+.fake

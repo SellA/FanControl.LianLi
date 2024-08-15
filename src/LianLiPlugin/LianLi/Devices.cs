@@ -106,28 +106,40 @@ namespace LianLi
 
         public void SetSpeed(int fancontroller_channel, int speed)
         {
-            var speed_800_1900 = (byte)((800 + (11 * speed)) / 19);
-            var speed_250_2000 = (byte)((250 + (17.5 * speed)) / 20);
-            var speed_200_2100 = (byte)((200 + (19 * speed)) / 21);
-
-            switch (_type)
+            byte speedByte;
+            if (speed == 0)
             {
-                case Type.SL:
-                    _device.Write(new byte[] { 224, (byte)(32 + fancontroller_channel), 0, speed_800_1900 });
-                    break;
-                case Type.SLV2:
-                    _device.Write(new byte[] { 224, (byte)(32 + fancontroller_channel), 0, speed_250_2000 });
-                    break;
-                case Type.AL:
-                    _device.Write(new byte[] { 224, (byte)(32 + fancontroller_channel), 0, speed_800_1900 });
-                    break;
-                case Type.ALV2:
-                    _device.Write(new byte[] { 224, (byte)(32 + fancontroller_channel), 0, speed_250_2000 });
-                    break;
-                case Type.SLI:
-                    _device.Write(new byte[] { 224, (byte)(32 + fancontroller_channel), 0, speed_200_2100 });
-                    break;
+                speedByte = 0xFF; // Assuming 0xFF represents 0 RPM.
             }
+            else
+            {
+                // Adjusted formula to allow for lower speeds.
+                // Example adjustment: Change the base speed and scaling factor.
+                var speed_100_1900 = (byte)Math.Max(0, Math.Min(255, (100 + (9 * speed)) / 18));
+                var speed_50_2000 = (byte)Math.Max(0, Math.Min(255, (50 + (15 * speed)) / 19));
+                var speed_0_2100 = (byte)Math.Max(0, Math.Min(255, (0 + (18 * speed)) / 20));
+                
+                switch (_type)
+                {
+                    case Type.SL:
+                    case Type.AL:
+                        speedByte = speed_100_1900;
+                        break;
+                    case Type.SLV2:
+                    case Type.ALV2:
+                        speedByte = speed_50_2000;
+                        break;
+                    case Type.SLI:
+                        speedByte = speed_0_2100;
+                        break;
+                    default:
+                        speedByte = 0; // Default case, added for safety.
+                        break;
+                }
+            }
+            
+            // Send the command with the calculated speedByte
+            _device.Write(new byte[] { 224, (byte)(32 + fancontroller_channel), 0, speedByte });
         }
 
         public float GetSpeed(int fancontroller_channel)
