@@ -8,9 +8,10 @@ namespace LianLi
     public class Devices
     {
 
-        private List<FanController> _fancontrollers = new List<FanController>{ };
+        private List<FanController> _fancontrollers = new List<FanController> { };
 
-        public Devices(bool enableARGB) {
+        public Devices(bool enableARGB)
+        {
 
             // Scan for controllers
             int[] VENDOR_IDS = { 0x0cf2 };
@@ -54,12 +55,13 @@ namespace LianLi
         {
             _fancontrollers[fancontroller_index].SetSpeed(fancontroller_channel, speed);
         }
-       
+
     }
 
     internal class FanController
     {
-        private enum Type {
+        private enum Type
+        {
             SL,
             SLV2,
             SLI,
@@ -78,7 +80,7 @@ namespace LianLi
             switch (device._pid)
             {
                 case 0xa100:
-                case 0x7750: 
+                case 0x7750:
                     _type = Type.SL;
                     break;
                 case 0xa101:
@@ -99,7 +101,7 @@ namespace LianLi
                     break;
             }
 
-            if(enableARGB){ SetARGB(); }
+            if (enableARGB) { SetARGB(); }
             for (int i = 0; i < 4; i++) { DisableRPMSync(i); }
         }
 
@@ -107,37 +109,17 @@ namespace LianLi
         public void SetSpeed(int fancontroller_channel, int speed)
         {
             byte speedByte;
+
             if (speed == 0)
             {
-                speedByte = 0xFF; // Assuming 0xFF represents 0 RPM.
+                speedByte = 0x00; // Assuming 0x00 represents 0 RPM.
             }
             else
             {
-                // Adjusted formula to allow for lower speeds.
-                // Example adjustment: Change the base speed and scaling factor.
-                var speed_0_1900 = (byte)Math.Max(0, Math.Min(255, (11 * speed)) / 19);
-                var speed_0_2000 = (byte)Math.Max(0, Math.Min(255, (17.5 * speed)) / 20);
-                var speed_0_2100 = (byte)Math.Max(0, Math.Min(255, (19 * speed)) / 21);
-                
-                switch (_type)
-                {
-                    case Type.SL:
-                    case Type.AL:
-                        speedByte = speed_0_1900;
-                        break;
-                    case Type.SLV2:
-                    case Type.ALV2:
-                        speedByte = speed_0_2000;
-                        break;
-                    case Type.SLI:
-                        speedByte = speed_0_2100;
-                        break;
-                    default:
-                        speedByte = 0; // Default case, added for safety.
-                        break;
-                }
+                var speed_200_2100 = (byte)((speed));
+                speedByte = speed_200_2100;
             }
-            
+
             // Send the command with the calculated speedByte
             _device.Write(new byte[] { 224, (byte)(32 + fancontroller_channel), 0, speedByte });
         }
@@ -183,7 +165,7 @@ namespace LianLi
         private void DisableRPMSync(int fancontroller_channel)
         {
             byte channelByte = (byte)((2 * fancontroller_channel) * 16);
-            if(fancontroller_channel == 0) { channelByte = (byte)(16); }
+            if (fancontroller_channel == 0) { channelByte = (byte)(16); }
 
             switch (_type)
             {
@@ -207,7 +189,7 @@ namespace LianLi
 
         private void SetARGB()
         {
-            switch(_type)
+            switch (_type)
             {
                 case Type.SL:
                     _device.Write(new byte[] { 224, 16, 48, 1, 0, 0, 0 });
@@ -227,7 +209,7 @@ namespace LianLi
             }
         }
 
-        
+
 
     }
 }
