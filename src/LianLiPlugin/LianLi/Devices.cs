@@ -115,19 +115,19 @@ namespace LianLi
             {
                 // Adjusted formula to allow for lower speeds.
                 // Example adjustment: Change the base speed and scaling factor.
-                var speed_100_1900 = (byte)Math.Max(0, Math.Min(255, (100 + (9 * speed)) / 18));
-                var speed_50_2000 = (byte)Math.Max(0, Math.Min(255, (50 + (15 * speed)) / 19));
-                var speed_0_2100 = (byte)Math.Max(0, Math.Min(255, (0 + (18 * speed)) / 20));
+                var speed_0_1900 = (byte)Math.Max(0, Math.Min(255, (11 * speed)) / 19);
+                var speed_0_2000 = (byte)Math.Max(0, Math.Min(255, (17.5 * speed)) / 20);
+                var speed_0_2100 = (byte)Math.Max(0, Math.Min(255, (19 * speed)) / 21);
                 
                 switch (_type)
                 {
                     case Type.SL:
                     case Type.AL:
-                        speedByte = speed_100_1900;
+                        speedByte = speed_0_1900;
                         break;
                     case Type.SLV2:
                     case Type.ALV2:
-                        speedByte = speed_50_2000;
+                        speedByte = speed_0_2000;
                         break;
                     case Type.SLI:
                         speedByte = speed_0_2100;
