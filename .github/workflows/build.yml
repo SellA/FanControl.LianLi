@@ -11,6 +11,7 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -21,7 +22,20 @@ jobs:
           dotnet-version: 6.0
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore src/FanControl.LianLiPlugin.sln
 
       - name: Build solution
-        run: dotnet build --configuration Release
+        run: dotnet build src/FanControl.LianLiPlugin.sln --configuration Release
+
+      - name: Publish binaries
+        if: success()
+        run: |
+          mkdir -p build
+          cp -r src/FanControl.LianLiPlugin/bin/Release/* build/
+        shell: bash
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: FanControl.LianLiPlugin
+          path: build/
