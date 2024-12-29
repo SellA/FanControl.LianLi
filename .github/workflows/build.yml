@@ -30,8 +30,8 @@ jobs:
       - name: Publish binaries
         if: success()
         run: |
-          mkdir -p build
-          cp -r src/FanControl.LianLiPlugin/bin/Release/* build/
+          mkdir build
+          cp src/bin/Release/* build/
         shell: bash
 
       - name: Upload artifact
